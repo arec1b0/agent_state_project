@@ -3,6 +3,12 @@ import os
 from typing import Optional
 
 class KVStore:
+    """
+    Redis access layer: session state snapshots (key `state:{session_id}`)
+    and idempotency locks (the raw idempotency key, SET NX with a TTL).
+    Configured via the REDIS_URL environment variable.
+    """
+
     def __init__(self) -> None:
         redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
         self.client = redis.from_url(redis_url, decode_responses=True)

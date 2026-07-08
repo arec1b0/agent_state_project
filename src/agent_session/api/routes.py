@@ -40,7 +40,14 @@ async def transition_state(
     guard: ExactlyOnceGuard = Depends(get_exactly_once_guard),
     manager: StateManager = Depends(get_state_manager)
 ) -> TransitionResponse:
-    
+    """
+    Apply one event to a session's state.
+
+    The idempotency key is checked first (409 on duplicates), then the event's
+    `previous_version` is validated against the current state version
+    (400 on mismatch). On success the event payload is merged into the session
+    context and the new state is returned.
+    """
     await guard.check_and_lock(request.idempotency_key)
     logger.info("processing_event", session_id=request.event.session_id, event_type=request.event.event_type)
     
@@ -57,7 +64,10 @@ async def get_state(
     session_id: str,
     manager: StateManager = Depends(get_state_manager)
 ) -> AgentState:
-    
+    """
+    Return the current state of a session. Unknown sessions return a fresh
+    state at version 0 (sessions are created implicitly by their first event).
+    """
     return await manager.get_current_state(session_id)
 
 @app.post("/session/rollback", response_model=AgentState)
@@ -65,6 +75,9 @@ async def rollback_state(
     request: RollbackRequest,
     engine: RollbackEngine = Depends(get_rollback_engine)
 ) -> AgentState:
-    
+    """
+    Roll a session back to a historical version by replaying its event journal
+    and overwriting the snapshot. The journal itself is never mutated.
+    """
     logger.warning("initiating_rollback", session_id=request.session_id, target_version=request.target_version)
     return await engine.rollback_to_version(request.session_id, request.target_version)

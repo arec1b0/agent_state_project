@@ -8,12 +8,26 @@ from .telemetry import AgentTelemetry
 logger = logging.getLogger(__name__)
 
 class RollbackEngine:
+    """
+    Rebuilds session state at a historical version by replaying the event
+    journal from the beginning, then overwrites the Redis snapshot with the
+    result. The journal itself is never mutated.
+    """
+
     def __init__(self, journal: EventJournal, kv_store: KVStore, telemetry: AgentTelemetry) -> None:
         self.journal = journal
         self.kv = kv_store
         self.telemetry = telemetry
 
     async def rollback_to_version(self, session_id: str, target_version: int) -> AgentState:
+        """
+        Replay the session's events in timestamp order until target_version is
+        reached and persist the rebuilt state as the new snapshot.
+
+        Raises:
+            RuntimeError: an event payload in the journal is corrupted, making
+                deterministic replay impossible.
+        """
         records = await self.journal.get_events_for_session(session_id)
         state = AgentState(session_id=session_id)
         

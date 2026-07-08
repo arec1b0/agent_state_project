@@ -13,6 +13,7 @@ class AgentStateClient:
         self.client = httpx.AsyncClient(base_url=base_url, timeout=10.0)
 
     async def get_state(self, session_id: str) -> Dict[str, Any]:
+        """Return the current AgentState for a session as a dict."""
         response = await self.client.get(f"/session/{session_id}")
         response.raise_for_status()
         return response.json()
@@ -25,6 +26,18 @@ class AgentStateClient:
         previous_version: int,
         idempotency_key: Optional[str] = None
     ) -> Dict[str, Any]:
+        """
+        Apply one event to a session.
+
+        `payload` is merged into the session context server-side.
+        `previous_version` must match the current state version (OCC), and
+        `idempotency_key` (defaults to a fresh UUID) guarantees exactly-once
+        application — pass a stable key when retrying the same logical action.
+
+        Raises:
+            RuntimeError: on any non-200 response, including OCC conflicts
+                (400) and duplicate idempotency keys (409).
+        """
         event_id = str(uuid.uuid4())
         key = idempotency_key or event_id
         

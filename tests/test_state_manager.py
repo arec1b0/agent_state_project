@@ -5,8 +5,8 @@ from src.agent_session.models.state import AgentState
 from src.agent_session.models.events import AgentEvent
 
 @pytest.mark.asyncio
-async def test_apply_event_success(mock_kv_store: AsyncMock, mock_journal: AsyncMock) -> None:
-    manager = StateManager(mock_kv_store, mock_journal)
+async def test_apply_event_success(mock_kv_store: AsyncMock, mock_journal: AsyncMock, mock_telemetry: AsyncMock) -> None:
+    manager = StateManager(mock_kv_store, mock_journal, mock_telemetry)
     
     initial_state = AgentState(session_id="session-1", version=0, context={})
     mock_kv_store.get_state.return_value = initial_state.model_dump_json()
@@ -28,8 +28,8 @@ async def test_apply_event_success(mock_kv_store: AsyncMock, mock_journal: Async
     mock_kv_store.set_state.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_apply_event_occ_failure(mock_kv_store: AsyncMock, mock_journal: AsyncMock) -> None:
-    manager = StateManager(mock_kv_store, mock_journal)
+async def test_apply_event_occ_failure(mock_kv_store: AsyncMock, mock_journal: AsyncMock, mock_telemetry: AsyncMock) -> None:
+    manager = StateManager(mock_kv_store, mock_journal, mock_telemetry)
     
     initial_state = AgentState(session_id="session-1", version=2, context={})
     mock_kv_store.get_state.return_value = initial_state.model_dump_json()

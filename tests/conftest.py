@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import AsyncMock
 from src.agent_session.infrastructure.kv_store import KVStore
 from src.agent_session.infrastructure.event_journal import EventJournal
+from src.agent_session.core.telemetry import AgentTelemetry
 
 @pytest.fixture
 def mock_kv_store() -> AsyncMock:
@@ -10,3 +11,7 @@ def mock_kv_store() -> AsyncMock:
 @pytest.fixture
 def mock_journal() -> AsyncMock:
     return AsyncMock(spec=EventJournal)
+
+@pytest.fixture
+def mock_telemetry() -> AsyncMock:
+    return AsyncMock(spec=AgentTelemetry)

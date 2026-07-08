@@ -4,6 +4,12 @@ from typing import List
 from ..models.events import AgentEvent
 
 class EventJournal:
+    """
+    Append-only event log in PostgreSQL (table `event_journal`, auto-created
+    on startup). The journal is the source of truth for a session's history
+    and the input for deterministic rollback.
+    """
+
     def __init__(self, pool: asyncpg.Pool) -> None:
         self.pool = pool
 

@@ -34,14 +34,14 @@ async def main() -> None:
 
     session_config = {"configurable": {"thread_id": "langgraph-demo-session"}}
 
-    print(f"\n--- Execution Turn 1 ---")
+    print("\n--- Execution Turn 1 ---")
     initial_input = {"step_count": 0, "latest_action": "initialized"}
     
     # ainvoke triggers the graph, which triggers APIStateCheckpointer.aput
     result = await graph.ainvoke(initial_input, config=session_config)
     print(f"Graph Output: {result}")
     
-    print(f"\n--- Execution Turn 2 ---")
+    print("\n--- Execution Turn 2 ---")
     # Passing a new input forces the graph to run again. 
     # LangGraph merges this input with the checkpointed state from our API before executing the worker.
     result = await graph.ainvoke({"latest_action": "trigger_turn_2"}, config=session_config)

@@ -5,6 +5,15 @@ from mlflow.client import MlflowClient
 from ..models.events import AgentEvent
 
 class AgentTelemetry:
+    """
+    Logs state transitions and rollbacks to MLflow.
+
+    Uses one experiment ("agent_sessions") with one run per session, tagged
+    with the session_id. Each transition logs latency and state-version
+    metrics plus the full event payload as a JSON artifact. Blocking MLflow
+    calls are dispatched to a thread executor to keep the event loop free.
+    """
+
     def __init__(self) -> None:
         self.client = MlflowClient(tracking_uri=os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000"))
         self.exp_name = "agent_sessions"

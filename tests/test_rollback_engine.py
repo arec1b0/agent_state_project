@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock
 from src.agent_session.core.rollback_engine import RollbackEngine
 
 @pytest.mark.asyncio
-async def test_rollback_to_version(mock_journal: AsyncMock, mock_kv_store: AsyncMock) -> None:
-    engine = RollbackEngine(mock_journal, mock_kv_store)
+async def test_rollback_to_version(mock_journal: AsyncMock, mock_kv_store: AsyncMock, mock_telemetry: AsyncMock) -> None:
+    engine = RollbackEngine(mock_journal, mock_kv_store, mock_telemetry)
     
     mock_journal.get_events_for_session.return_value = [
         {"payload": json.dumps({"step": 1})},

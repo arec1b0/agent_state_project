@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'agent-session-api'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['agent-session-api:80']

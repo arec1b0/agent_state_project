@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-session-config
+  labels:
+    app: agent-session
+data:
+  # In a production environment, override these with internal DNS names 
+  # of your managed database and cache services.
+  REDIS_URL: "redis://redis-master:6379/0"
+  DB_URL: "postgresql://user:pass@postgres-primary:5432/agent_state"

@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DB_URL=postgresql://user:pass@db:5432/agent_state
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - redis
+      - db
+      - mlflow
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: agent_state
+    ports:
+      - "5432:5432"
+
+  mlflow:
+      image: ghcr.io/mlflow/mlflow:v2.10.2
+      ports:
+        - "5000:5000"
+      environment:
+        - MLFLOW_BACKEND_STORE_URI=postgresql://user:pass@db:5432/agent_state
+        - MLFLOW_DEFAULT_ARTIFACT_ROOT=/mlflow/artifacts
+      # Overriding the command to install the missing PostgreSQL driver first
+      command: >
+        sh -c "pip install psycopg2-binary && 
+        mlflow server --backend-store-uri postgresql://user:pass@db:5432/agent_state --default-artifact-root /mlflow/artifacts --host 0.0.0.0"
+      depends_on:
+        - db

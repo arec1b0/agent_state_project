@@ -1,0 +1,56 @@
+{
+  "title": "Agent Session Health",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "HTTP Request Rate",
+      "targets": [
+        {
+          "expr": "rate(http_requests_total[5m])",
+          "legendFormat": "{{method}} {{endpoint}}"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "State Transition Error Rate (HTTP 4xx/5xx)",
+      "targets": [
+        {
+          "expr": "rate(http_requests_total{status=~\"[45].*\"}[5m])",
+          "legendFormat": "Errors"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "OCC Conflict Rate (HTTP 409)",
+      "targets": [
+        {
+          "expr": "rate(http_requests_total{status=\"409\"}[5m])",
+          "legendFormat": "Conflicts"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      }
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1
+}
